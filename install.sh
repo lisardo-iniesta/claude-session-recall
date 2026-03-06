@@ -124,7 +124,15 @@ chmod +x "$LIB_DIR/hook-wrapper.sh"
 
 python3 "$LIB_DIR/register-hook.py" register "$SETTINGS_FILE" "$LIB_DIR/hook-wrapper.sh"
 
-# --- 7. Initialize QMD index ---
+# --- 7. Install /recall command for Claude Code ---
+echo ""
+echo "Installing Claude Code /recall command..."
+COMMANDS_DIR="$HOME/.claude/commands"
+mkdir -p "$COMMANDS_DIR"
+cp "$REPO_DIR/commands/recall.md" "$COMMANDS_DIR/recall.md"
+echo "  /recall command installed -> $COMMANDS_DIR/recall.md"
+
+# --- 8. Initialize QMD index ---
 if command -v qmd &>/dev/null; then
     if ! qmd --index sessions collection list &>/dev/null 2>&1; then
         echo ""
@@ -141,10 +149,11 @@ fi
 echo ""
 echo "  Installed successfully!"
 echo ""
-echo "  Hook:     SessionEnd -> $LIB_DIR/hook-wrapper.sh"
-echo "  Search:   claude-session-recall \"query\""
-echo "  Backfill: claude-session-backfill"
-echo "  Output:   $OUTPUT_DIR"
+echo "  Hook:      SessionEnd -> $LIB_DIR/hook-wrapper.sh"
+echo "  /recall:   Use /recall <query> inside Claude Code sessions"
+echo "  CLI:       claude-session-recall \"query\" (standalone search)"
+echo "  Backfill:  claude-session-backfill"
+echo "  Output:    $OUTPUT_DIR"
 echo ""
 
 # Check if BIN_DIR is in PATH

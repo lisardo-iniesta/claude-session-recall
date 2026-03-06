@@ -39,7 +39,14 @@ for cmd in claude-session-recall claude-session-backfill; do
         rm -f "$BIN_DIR/$cmd"
     fi
 done
-echo "Removing commands..."
+echo "Removing CLI commands..."
+
+# Remove Claude Code /recall command
+RECALL_CMD="$HOME/.claude/commands/recall.md"
+if [ -f "$RECALL_CMD" ]; then
+    echo "Removing /recall command..."
+    rm -f "$RECALL_CMD"
+fi
 
 echo ""
 echo "  Uninstalled successfully!"

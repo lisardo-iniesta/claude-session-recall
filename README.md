@@ -23,7 +23,8 @@ The installer will:
 2. Install [QMD](https://github.com/tobilu/qmd) if missing
 3. Ask where to save session markdown (default: `~/claude-sessions/`)
 4. Register a `SessionEnd` hook in `~/.claude/settings.json`
-5. Add `claude-session-recall` and `claude-session-backfill` to your PATH
+5. Install the `/recall` command for use inside Claude Code
+6. Add `claude-session-recall` and `claude-session-backfill` to your PATH
 
 Then backfill your existing sessions:
 
@@ -32,6 +33,20 @@ claude-session-backfill
 ```
 
 ## Usage
+
+### Inside Claude Code (recommended)
+
+Just type `/recall` followed by your query:
+
+```
+/recall authentication flow
+/recall how did we set up docker
+/recall that bug we fixed last week
+```
+
+Claude will search your session history and present relevant results with context.
+
+### From the terminal
 
 ```bash
 # Search your session history
@@ -121,12 +136,12 @@ This removes the hook, commands, and library files. Your exported sessions (`~/c
 
 ## Comparison
 
-| Tool | Search | Auto-export | Dependencies | Format |
-|------|--------|-------------|--------------|--------|
-| **claude-session-recall** | Full-text (QMD) | SessionEnd hook | stdlib + QMD | Markdown |
-| [claude-code-transcripts](https://github.com/simonw/claude-code-transcripts) | No | No | pip (uv) | HTML |
-| [claude-conversation-extractor](https://github.com/ZeroSumQuant/claude-conversation-extractor) | Yes (spaCy opt.) | No | pip | MD/JSON/HTML |
-| [cctrace](https://github.com/jimmc414/cctrace) | No | No | pip | Markdown |
+| Tool | Search | /recall in Claude Code | Auto-export | Dependencies |
+|------|--------|------------------------|-------------|--------------|
+| **claude-session-recall** | Full-text (QMD) | Yes | SessionEnd hook | stdlib + QMD |
+| [claude-code-transcripts](https://github.com/simonw/claude-code-transcripts) | No | No | No | pip (uv) |
+| [claude-conversation-extractor](https://github.com/ZeroSumQuant/claude-conversation-extractor) | Yes (spaCy opt.) | No | No | pip |
+| [cctrace](https://github.com/jimmc414/cctrace) | No | No | No | pip |
 
 ## Troubleshooting
 
