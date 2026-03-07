@@ -23,7 +23,7 @@ The installer will:
 2. Install [QMD](https://github.com/tobilu/qmd) if missing
 3. Ask where to save session markdown (default: `~/claude-sessions/`)
 4. Register a `SessionEnd` hook in `~/.claude/settings.json`
-5. Install the `/recall` command for use inside Claude Code
+5. Install the `/recall` command and `/recall-sessions` skill for use inside Claude Code
 6. Add `claude-session-recall` and `claude-session-backfill` to your PATH
 
 Then backfill your existing sessions:
@@ -36,15 +36,21 @@ claude-session-backfill
 
 ### Inside Claude Code (recommended)
 
-Just type `/recall` followed by your query:
+Two ways to search — both work, pick whichever you prefer:
 
+**`/recall` (custom command)** — lightweight, quick search:
 ```
 /recall authentication flow
 /recall how did we set up docker
 /recall that bug we fixed last week
 ```
 
-Claude will search your session history and present relevant results with context.
+**`/recall-sessions` (skill)** — richer context, Claude understands session metadata and can read full transcripts:
+```
+/recall-sessions that bug we fixed last week
+```
+
+The skill gives Claude more context about how to parse results, read full session files, and present findings with date/project/branch metadata.
 
 ### From the terminal
 

@@ -48,6 +48,13 @@ if [ -f "$RECALL_CMD" ]; then
     rm -f "$RECALL_CMD"
 fi
 
+# Remove Claude Code /recall-sessions skill
+SKILL_DIR="$HOME/.claude/skills/recall-sessions"
+if [ -d "$SKILL_DIR" ]; then
+    echo "Removing /recall-sessions skill..."
+    rm -rf "$SKILL_DIR"
+fi
+
 echo ""
 echo "  Uninstalled successfully!"
 echo ""

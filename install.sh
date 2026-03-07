@@ -132,6 +132,13 @@ mkdir -p "$COMMANDS_DIR"
 cp "$REPO_DIR/commands/recall.md" "$COMMANDS_DIR/recall.md"
 echo "  /recall command installed -> $COMMANDS_DIR/recall.md"
 
+# --- 7b. Install /recall-sessions skill for Claude Code ---
+echo "Installing Claude Code /recall-sessions skill..."
+SKILLS_DIR="$HOME/.claude/skills/recall-sessions"
+mkdir -p "$SKILLS_DIR"
+cp "$REPO_DIR/skills/recall-sessions/SKILL.md" "$SKILLS_DIR/SKILL.md"
+echo "  /recall-sessions skill installed -> $SKILLS_DIR/SKILL.md"
+
 # --- 8. Initialize QMD index ---
 if command -v qmd &>/dev/null; then
     if ! qmd --index sessions collection list &>/dev/null 2>&1; then
@@ -150,7 +157,8 @@ echo ""
 echo "  Installed successfully!"
 echo ""
 echo "  Hook:      SessionEnd -> $LIB_DIR/hook-wrapper.sh"
-echo "  /recall:   Use /recall <query> inside Claude Code sessions"
+echo "  /recall:          Use /recall <query> inside Claude Code sessions"
+echo "  /recall-sessions: Skill-based search (richer context for Claude)"
 echo "  CLI:       claude-session-recall \"query\" (standalone search)"
 echo "  Backfill:  claude-session-backfill"
 echo "  Output:    $OUTPUT_DIR"
