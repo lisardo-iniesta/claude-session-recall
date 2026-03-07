@@ -13,7 +13,7 @@ Claude Code stores session transcripts as JSONL files buried in `~/.claude/proje
 ## Quick Install
 
 ```bash
-git clone https://github.com/lisardoiniesta/claude-session-recall.git
+git clone https://github.com/lisardo-iniesta/claude-session-recall.git
 cd claude-session-recall
 ./install.sh
 ```
@@ -25,6 +25,8 @@ The installer will:
 4. Register a `SessionEnd` hook in `~/.claude/settings.json`
 5. Install the `/recall` command and `/recall-sessions` skill for use inside Claude Code
 6. Add `claude-session-recall` and `claude-session-backfill` to your PATH
+
+> **Important:** Restart Claude Code after installing for the hook to take effect. Make sure `~/.local/bin` is in your `PATH`.
 
 Then backfill your existing sessions:
 
@@ -70,25 +72,21 @@ claude-session-backfill --dry-run
 
 ## How it works
 
-```
-Claude Code SessionEnd hook fires
-        |
-        v
-+------------------+     +-----------------+     +-------------------+
-| export-session.sh|---->| parse-session.py |---->| ~/claude-sessions |
-| reads stdin JSON |     | JSONL -> MD      |     | /YYYY/MM-DD/*.md  |
-+------------------+     +-----------------+     +---------+---------+
-                                                           |
-                                                  +--------v--------+
-                                                  |   qmd index     |
-                                                  |   update + embed|
-                                                  +-----------------+
+```mermaid
+flowchart LR
+    A["Claude Code<br/>session ends"] -->|SessionEnd hook| B["export-session.sh"]
+    B -->|reads JSONL| C["parse-session.py"]
+    C -->|writes markdown| D["~/claude-sessions/<br/>YYYY/MM-DD/uuid.md"]
+    D -->|indexes| E["QMD<br/>full-text search"]
+    E -->|results| F["/recall inside<br/>Claude Code"]
+    E -->|results| G["CLI:<br/>claude-session-recall"]
 ```
 
 1. **SessionEnd hook** fires when you exit Claude Code — receives session ID and transcript path via stdin
-2. **parse-session.py** reads the JSONL, extracts user/assistant text (discards tool calls, thinking blocks), builds YAML-frontmattered markdown
+2. **parse-session.py** reads the JSONL, extracts user/assistant messages (discards tool calls, thinking blocks), builds YAML-frontmattered markdown
 3. **Markdown** is written to `~/claude-sessions/YYYY/MM-DD/<session-id>.md`
-4. **QMD** indexes the new file for full-text search (BM25 + optional embeddings)
+4. **QMD** indexes the new file for full-text search (BM25 + optional semantic embeddings)
+5. **Search** via `/recall` command inside Claude Code or `claude-session-recall` CLI
 
 ### Output format
 
@@ -128,9 +126,10 @@ Sessions with fewer than 200 words are skipped (configurable).
 
 ## Requirements
 
-- **Python 3.8+** (stdlib only -- no pip install needed)
+- **Python 3.8+** (stdlib only — no pip install needed)
 - **Node.js 16+** (for QMD)
 - **Claude Code** (the thing you're searching)
+- **macOS or Linux** (bash required; on Windows, use WSL)
 
 ## Uninstall
 
@@ -144,7 +143,7 @@ This removes the hook, commands, and library files. Your exported sessions (`~/c
 
 | Tool | Search | /recall in Claude Code | Auto-export | Dependencies |
 |------|--------|------------------------|-------------|--------------|
-| **claude-session-recall** | Full-text (QMD) | Yes | SessionEnd hook | stdlib + QMD |
+| **claude-session-recall** | Full-text (QMD) | Yes | SessionEnd hook | Python stdlib + Node.js (QMD) |
 | [claude-code-transcripts](https://github.com/simonw/claude-code-transcripts) | No | No | No | pip (uv) |
 | [claude-conversation-extractor](https://github.com/ZeroSumQuant/claude-conversation-extractor) | Yes (spaCy opt.) | No | No | pip |
 | [cctrace](https://github.com/jimmc414/cctrace) | No | No | No | pip |

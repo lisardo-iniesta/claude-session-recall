@@ -37,7 +37,7 @@ Each session markdown has YAML frontmatter with:
 qmd --index sessions search "authentication system refactoring"
 
 # Search with more results
-qmd --index sessions search --limit 10 "docker deployment"
+qmd --index sessions search -n 10 "docker deployment"
 
 # Search for sessions about a specific project
 qmd --index sessions search "my-project memory search"
