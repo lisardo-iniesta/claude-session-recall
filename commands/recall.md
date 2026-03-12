@@ -17,6 +17,15 @@ The user wants to search their Claude Code session history. Their query is: $ARG
    - The matching snippet with context
 4. If the user wants more detail on a specific result, read the full markdown file from the path shown (replace `qmd://sessions/` prefix with the output directory, default `~/claude-sessions/`)
 
+## Deep Search (QMD 2.0+)
+
+If fast search doesn't find what the user needs, escalate to hybrid search (~13s):
+
+```bash
+qmd --index sessions query "authentication refactoring"
+qmd --index sessions query --intent "the recall skill, not auth" "recall"
+```
+
 ## Examples
 
 ```bash
@@ -24,7 +33,7 @@ The user wants to search their Claude Code session history. Their query is: $ARG
 qmd --index sessions search "authentication refactoring"
 
 # More results
-qmd --index sessions search -n 10 "docker deployment"
+qmd --index sessions search --limit 10 "docker deployment"
 ```
 
 ## If no results
@@ -32,3 +41,4 @@ qmd --index sessions search -n 10 "docker deployment"
 - The QMD index may need updating: `qmd --index sessions update && qmd --index sessions embed`
 - The user may not have run `claude-session-backfill` yet
 - Try broader search terms
+- Try `qmd --index sessions query` for hybrid search

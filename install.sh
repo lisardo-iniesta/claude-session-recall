@@ -63,12 +63,22 @@ OUTPUT_DIR="${OUTPUT_DIR/#\~/$HOME}"
 mkdir -p "$OUTPUT_DIR"
 echo "  Output: $OUTPUT_DIR"
 
-# --- 3. Install QMD if missing ---
+# --- 3. Install or upgrade QMD ---
+QMD_MIN_VERSION="2.0"
 echo ""
 if command -v qmd &>/dev/null; then
-    echo "QMD $(qmd --version 2>/dev/null || echo 'installed') OK"
+    QMD_VER=$(qmd --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0")
+    QMD_MAJOR=$(echo "$QMD_VER" | cut -d. -f1)
+    QMD_MINOR=$(echo "$QMD_VER" | cut -d. -f2)
+    if [ "$QMD_MAJOR" -lt 2 ]; then
+        echo "QMD $QMD_VER found — upgrading to $QMD_MIN_VERSION+ for hybrid query support..."
+        npm install -g @tobilu/qmd
+        echo "  QMD upgraded to $(qmd --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo 'latest')"
+    else
+        echo "QMD $QMD_VER OK (>= $QMD_MIN_VERSION)"
+    fi
 else
-    echo "Installing QMD (full-text search engine)..."
+    echo "Installing QMD $QMD_MIN_VERSION+ (hybrid search engine)..."
     npm install -g @tobilu/qmd
     echo "  QMD installed"
 fi

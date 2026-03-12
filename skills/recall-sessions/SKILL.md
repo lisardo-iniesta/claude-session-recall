@@ -5,7 +5,7 @@ description: Search Claude Code session transcripts using QMD hybrid search. Use
 
 # /recall-sessions — Session History Search
 
-Search Claude Code session transcripts using QMD's hybrid BM25 + semantic search.
+Search Claude Code session transcripts using QMD.
 
 ## Usage
 
@@ -30,6 +30,15 @@ Each session markdown has YAML frontmatter with:
 - `model` — Claude model used
 - `messages` — number of user messages
 
+## Deep Search (QMD 2.0+)
+
+For higher-quality results when fast search isn't enough, use `query` (hybrid BM25 + vector + LLM reranking, ~13s):
+
+```bash
+qmd --index sessions query "authentication system refactoring"
+qmd --index sessions query --intent "the recall skill, not auth" "recall"
+```
+
 ## Examples
 
 ```bash
@@ -37,7 +46,7 @@ Each session markdown has YAML frontmatter with:
 qmd --index sessions search "authentication system refactoring"
 
 # Search with more results
-qmd --index sessions search -n 10 "docker deployment"
+qmd --index sessions search --limit 10 "docker deployment"
 
 # Search for sessions about a specific project
 qmd --index sessions search "my-project memory search"

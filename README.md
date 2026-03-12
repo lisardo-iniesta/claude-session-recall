@@ -4,6 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org)
+[![QMD 2.0+](https://img.shields.io/badge/QMD-2.0+-purple.svg)](https://github.com/tobilu/qmd)
 [![No pip dependencies](https://img.shields.io/badge/pip%20deps-none-green.svg)]()
 
 ## What it does
@@ -20,7 +21,7 @@ cd claude-session-recall
 
 The installer will:
 1. Check prerequisites (Python 3.8+, Node.js)
-2. Install [QMD](https://github.com/tobilu/qmd) if missing
+2. Install [QMD](https://github.com/tobilu/qmd) 2.0+ (or upgrade if < 2.0)
 3. Ask where to save session markdown (default: `~/claude-sessions/`)
 4. Register a `SessionEnd` hook in `~/.claude/settings.json`
 5. Install the `/recall` command and `/recall-sessions` skill for use inside Claude Code
@@ -40,6 +41,11 @@ claude-session-backfill
 
 Two ways to search — both work, pick whichever you prefer:
 
+**`/recall-sessions` (skill)** — richer context, Claude understands session metadata and can read full transcripts:
+```
+/recall-sessions that bug we fixed last week
+```
+
 **`/recall` (custom command)** — lightweight, quick search:
 ```
 /recall authentication flow
@@ -47,12 +53,19 @@ Two ways to search — both work, pick whichever you prefer:
 /recall that bug we fixed last week
 ```
 
-**`/recall-sessions` (skill)** — richer context, Claude understands session metadata and can read full transcripts:
-```
-/recall-sessions that bug we fixed last week
-```
-
 The skill gives Claude more context about how to parse results, read full session files, and present findings with date/project/branch metadata.
+
+### Deep search (QMD 2.0+)
+
+Default search uses fast BM25 keyword matching (<1s). For harder queries, QMD 2.0+ also supports hybrid search with semantic embeddings and LLM reranking (~13s):
+
+```bash
+# Hybrid search (slower, higher quality)
+qmd --index sessions query "authentication refactoring"
+
+# Disambiguate with --intent
+qmd --index sessions query --intent "the recall skill, not auth" "recall"
+```
 
 ### From the terminal
 
@@ -78,15 +91,15 @@ flowchart LR
     B -->|reads JSONL| C["parse-session.py"]
     C -->|writes markdown| D["~/claude-sessions/<br/>YYYY/MM-DD/uuid.md"]
     D -->|indexes| E["QMD<br/>full-text search"]
-    E -->|results| F["/recall inside<br/>Claude Code"]
+    E -->|results| F["/recall-sessions<br/>inside Claude Code"]
     E -->|results| G["CLI:<br/>claude-session-recall"]
 ```
 
 1. **SessionEnd hook** fires when you exit Claude Code — receives session ID and transcript path via stdin
 2. **parse-session.py** reads the JSONL, extracts user/assistant messages (discards tool calls, thinking blocks), builds YAML-frontmattered markdown
 3. **Markdown** is written to `~/claude-sessions/YYYY/MM-DD/<session-id>.md`
-4. **QMD** indexes the new file for full-text search (BM25 + optional semantic embeddings)
-5. **Search** via `/recall` command inside Claude Code or `claude-session-recall` CLI
+4. **QMD** indexes the new file for full-text search (BM25 keywords; hybrid search available via `qmd query`)
+5. **Search** via `/recall-sessions` skill or `/recall` command inside Claude Code, or `claude-session-recall` CLI
 
 ### Output format
 
@@ -128,6 +141,7 @@ Sessions with fewer than 200 words are skipped (configurable).
 
 - **Python 3.8+** (stdlib only — no pip install needed)
 - **Node.js 16+** (for QMD)
+- **QMD 2.0+** (installed automatically by `install.sh`)
 - **Claude Code** (the thing you're searching)
 - **macOS or Linux** (bash required; on Windows, use WSL)
 
@@ -143,7 +157,7 @@ This removes the hook, commands, and library files. Your exported sessions (`~/c
 
 | Tool | Search | /recall in Claude Code | Auto-export | Dependencies |
 |------|--------|------------------------|-------------|--------------|
-| **claude-session-recall** | Full-text (QMD) | Yes | SessionEnd hook | Python stdlib + Node.js (QMD) |
+| **claude-session-recall** | Full-text + hybrid (QMD) | Yes | SessionEnd hook | Python stdlib + Node.js (QMD) |
 | [claude-code-transcripts](https://github.com/simonw/claude-code-transcripts) | No | No | No | pip (uv) |
 | [claude-conversation-extractor](https://github.com/ZeroSumQuant/claude-conversation-extractor) | Yes (spaCy opt.) | No | No | pip |
 | [cctrace](https://github.com/jimmc414/cctrace) | No | No | No | pip |
